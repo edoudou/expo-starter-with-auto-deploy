@@ -1,0 +1,42 @@
+name: Publish Expo Preview
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+
+jobs:
+  publish-preview:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --non-interactive
+
+      - name: Setup Expo CLI
+        uses: expo/expo-github-action@v8
+        with:
+          expo-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Publish preview update
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          RELEASE_CHANNEL: pr-${{ github.event.pull_request.number }}
+        run: expo publish --non-interactive --release-channel "$RELEASE_CHANNEL"
