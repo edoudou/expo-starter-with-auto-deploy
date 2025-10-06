@@ -1,0 +1,30 @@
+name: Cleanup Expo Preview
+
+on:
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  remove-preview-channel:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha || github.event.pull_request.head.sha }}
+
+      - name: Setup Expo CLI
+        uses: expo/expo-github-action@v8
+        with:
+          expo-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Delete preview channel
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          RELEASE_CHANNEL: pr-${{ github.event.pull_request.number }}
+        run: expo channel:delete "$RELEASE_CHANNEL" --non-interactive || echo "Channel already removed"
