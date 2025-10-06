@@ -68,3 +68,12 @@ Main screens:
 ![Login screen](https://i.imgur.com/ynyvDe5.png)
 
 ![Signup screen](https://i.imgur.com/ZtWEpnx.png)
+
+## Continuous deployment
+
+This starter includes GitHub Actions workflows to automate deployments:
+
+- **Deploy Expo App** (`.github/workflows/expo-deploy.yml`) publishes the app to Expo on pushes to `main`. Set the `EXPO_TOKEN` repository secret with a token generated from your Expo account so the workflow can authenticate before running `expo publish`.
+- **Deploy Supabase Edge Functions** (`.github/workflows/supabase-edge-functions.yml`) deploys any edge functions stored under `supabase/functions` using the Supabase CLI. Provide `SUPABASE_ACCESS_TOKEN` and `SUPABASE_PROJECT_ID` secrets so the workflow can log in and target the correct project.
+
+Both workflows can also be triggered manually from the GitHub Actions tab with the **Run workflow** button.
